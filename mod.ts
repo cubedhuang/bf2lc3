@@ -33,26 +33,73 @@ BRN ZERO
 `
 ];
 
-for (const char of input) {
-	if (char === "+") {
+type ArithmeticInstruction = {
+	type: "+" | "-";
+	count: number;
+};
+
+type PointerInstruction = {
+	type: ">" | "<";
+	count: number;
+};
+
+type IOInstruction = {
+	type: "." | ",";
+};
+
+type LoopInstruction = {
+	type: "[" | "]";
+};
+
+type Instruction =
+	| ArithmeticInstruction
+	| PointerInstruction
+	| IOInstruction
+	| LoopInstruction;
+
+const instructions: Instruction[] = [];
+
+for (let i = 0; i < input.length; i++) {
+	const char = input[i];
+	if (char === "+" || char === "-") {
+		let count = 1;
+		while (input[i + 1] === char && count < 15) {
+			count++;
+			i++;
+		}
+		instructions.push({ type: char, count });
+	} else if (char === ">" || char === "<") {
+		let count = 1;
+		while (input[i + 1] === char) {
+			count++;
+			i++;
+		}
+		instructions.push({ type: char, count });
+	} else {
+		instructions.push({ type: char } as Instruction);
+	}
+}
+
+for (const instruction of instructions) {
+	if (instruction.type === "+") {
 		output.push("LDR R0, R1, #0");
-		output.push("ADD R0, R0, #1");
+		output.push(`ADD R0, R0, #${instruction.count}`);
 		output.push("STR R0, R1, #0");
-	} else if (char === "-") {
+	} else if (instruction.type === "-") {
 		output.push("LDR R0, R1, #0");
-		output.push("ADD R0, R0, #-1");
+		output.push(`ADD R0, R0, #-${instruction.count}`);
 		output.push("STR R0, R1, #0");
-	} else if (char === ">") {
-		output.push("ADD R1, R1, #1");
-	} else if (char === "<") {
-		output.push("ADD R1, R1, #-1");
-	} else if (char === ".") {
+	} else if (instruction.type === ">") {
+		output.push(`ADD R1, R1, #${instruction.count}`);
+	} else if (instruction.type === "<") {
+		output.push(`ADD R1, R1, #-${instruction.count}`);
+	} else if (instruction.type === ".") {
 		output.push("LDR R0, R1, #0");
 		output.push("OUT");
-	} else if (char === ",") {
+	} else if (instruction.type === ",") {
 		output.push("IN");
 		output.push("STR R0, R1, #0");
-	} else if (char === "[") {
+	} else if (instruction.type === "[") {
 		const label = labelId++;
 		stack.push(label);
 		output.push(`LDR R0, R1, #0`);
@@ -63,7 +110,7 @@ for (const char of input) {
 		output.push(`JSR END${label}`);
 
 		output.push(`START${label}`);
-	} else if (char === "]") {
+	} else if (instruction.type === "]") {
 		const label = stack.pop();
 		if (label === undefined) {
 			throw new Error("Unmatched ]");
