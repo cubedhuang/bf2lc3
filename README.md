@@ -1,6 +1,6 @@
 # bf2lc3
 
-Converts Brainfuck code to LC-3 assembly code. Uses Deno.
+Converts Brainfuck code to LC-3 assembly code. Uses Deno. (I am unfortunately a webpilled typescripthead.)
 
 ## Usage
 
