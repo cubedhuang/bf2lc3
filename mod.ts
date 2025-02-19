@@ -1,6 +1,7 @@
-const NAME = "fib";
+const IN = Deno.args[0];
+const OUT = Deno.args[1];
 
-const input = await Deno.readTextFile(`${NAME}.bf`);
+const input = await Deno.readTextFile(IN);
 
 const stack: number[] = [];
 let labelId = 0;
@@ -132,4 +133,4 @@ if (stack.length > 0) {
 
 const end = ["", "HALT", "", ".end", "", ".orig x4000", ".blkw x4000", ".end"];
 
-await Deno.writeTextFile(`${NAME}.asm`, output.concat(end).join("\n"));
+await Deno.writeTextFile(OUT, output.concat(end).join("\n"));
